@@ -1,1 +1,5 @@
 pdf
+
+docs/*.bak
+
+docs/*.lock
