@@ -3,3 +3,5 @@ pdf
 docs/*.bak
 
 docs/*.lock
+
+.env
