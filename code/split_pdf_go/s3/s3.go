@@ -2,10 +2,12 @@ package s3
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
 	"split_pdf_go/util"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -43,6 +45,26 @@ func (basics BucketBasics) DownloadFile(bucketName string, objectKey string, fil
 	return err
 }
 
+// UploadFile reads from a file and puts the data into an object in a bucket.
+func (basics BucketBasics) UploadFile(bucketName string, objectKey string, fileName string) error {
+	file, err := os.Open(fileName)
+	if err != nil {
+		log.Printf("Couldn't open file %v to upload. Here's why: %v\n", fileName, err)
+	} else {
+		defer file.Close()
+		_, err = basics.S3Client.PutObject(context.TODO(), &s3.PutObjectInput{
+			Bucket: aws.String(bucketName),
+			Key:    aws.String(objectKey),
+			Body:   file,
+		})
+		if err != nil {
+			log.Printf("Couldn't upload file %v to %v:%v. Here's why: %v\n",
+				fileName, bucketName, objectKey, err)
+		}
+	}
+	return err
+}
+
 // envファイルを読み込んだ上で、環境変数に格納されたプロパティをもとにファイルをダウンロード
 func SaveTargetFileInTmp(envPath string) {
 	// tmpディレクトリがない場合は作成
@@ -71,4 +93,26 @@ func SaveTargetFileInTmp(envPath string) {
 
 	basics.DownloadFile(os.Getenv("BACKET_NAME"), os.Getenv("FILE_NAME"), "./tmp/tmp.pdf")
 
+}
+
+// s3にファイルをアップロードする処理
+func UplodTargetFileInSpritRange(envPath string, splitRange string) {
+	// AWS SDKの設定をロード
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-northeast-1"))
+	if err != nil {
+		log.Fatalf("Unable to load SDK config, %v", err)
+	}
+
+	// S3クライアントを作成
+	s3Client := s3.NewFromConfig(cfg)
+
+	// BucketBasicsのインスタンスを作成
+	basics := BucketBasics{
+		S3Client: s3Client,
+	}
+	// 現在の時刻を取得してフォーマット
+	timestamp := time.Now().Format("20060102150405")
+	uploadFileName := fmt.Sprintf("%s_splited_%s_%s.pdf", os.Getenv("FILE_NAME"), splitRange, timestamp)
+
+	basics.UploadFile(os.Getenv("BACKET_NAME"), uploadFileName, "./output.pdf")
 }
