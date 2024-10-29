@@ -43,7 +43,8 @@ func (basics BucketBasics) DownloadFile(bucketName string, objectKey string, fil
 	return err
 }
 
-func saveTargetFileInTmp(envPath string) {
+// envファイルを読み込んだ上で、環境変数に格納されたプロパティをもとにファイルをダウンロード
+func SaveTargetFileInTmp(envPath string) {
 	// tmpディレクトリがない場合は作成
 	if _, err := os.Stat("tmp"); os.IsNotExist(err) {
 		os.Mkdir("tmp", 0777)

@@ -3,7 +3,7 @@ package s3
 import (
 	"os"
 	"syscall"
-	"testing" //<- 超わかる
+	"testing"
 
 	"github.com/stretchr/testify/assert" //assertパッケージを追加
 )
@@ -11,7 +11,7 @@ import (
 func TestSaveTargetFileInTmp(t *testing.T) {
 
 	// envファイルを読み込んだ上で、環境変数に格納されたプロパティをもとにファイルをダウンロード
-	saveTargetFileInTmp("../.env")
+	SaveTargetFileInTmp("../.env")
 
 	//ファイルの存在を確認
 	filename := "./tmp/tmp.pdf"
