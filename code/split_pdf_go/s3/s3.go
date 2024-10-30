@@ -72,9 +72,12 @@ func SaveTargetFileInTmp(envPath string) {
 		os.Mkdir("tmp", 0777)
 	}
 
-	err := util.LoadEnv(envPath)
-	if err != nil {
-		log.Fatalf("Failed to load .env file: %v", err)
+	// PROD="true"であれば、.envファイルを読み込まない
+	if os.Getenv("PROD") != "true" {
+		err := util.LoadEnv(envPath)
+		if err != nil {
+			log.Fatalf("Failed to load .env file: %v", err)
+		}
 	}
 
 	// AWS SDKの設定をロード
@@ -97,6 +100,14 @@ func SaveTargetFileInTmp(envPath string) {
 
 // s3にファイルをアップロードする処理
 func UplodTargetFileInSpritRange(envPath string, splitRange string) {
+	// PROD="true"であれば、.envファイルを読み込まない
+	if os.Getenv("PROD") != "true" {
+		err := util.LoadEnv(envPath)
+		if err != nil {
+			log.Fatalf("Failed to load .env file: %v", err)
+		}
+	}
+
 	// AWS SDKの設定をロード
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-northeast-1"))
 	if err != nil {
