@@ -12,8 +12,6 @@
 ディレクトリの移動
 ```
 cd code/split_go
-go build
-./split_pdf_go -start 1 -end 4
 ```
 
 アプリケーションのビルドからの実行
