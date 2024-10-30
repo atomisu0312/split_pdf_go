@@ -29,10 +29,8 @@ jobs:
       run: echo "time_stamp=$(date +%s)" >> $GITHUB_ENV
     - name: Build the Docker image
       id: build
-      env:
-        ECR_REPOSITORY_NAME: ${{ secrets.ECR_REPOSITORY_NAME }}
       run: |
-        docker build ./code/split_pdf_go --file ./code/split_pdf_go/Dockerfile --tag ${{ env.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }} --platform linux/amd64
+        docker build ./code/split_pdf_go --file ./code/split_pdf_go/Dockerfile --tag ${{ secrets.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }} --platform linux/amd64
         echo "::set-output name=image_tag::${{ env.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }}"
     - name: login to docker hub
       env:
@@ -44,7 +42,7 @@ jobs:
       env:
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         time_stamp: ${{ env.time_stamp }}
-      run: docker tag  ${{ env.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-1.amazonaws.com/${{ env.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }}
+      run: docker tag  ${{ env.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-1.amazonaws.com/${{ secrets.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }}
     - name: push docker image
       env:
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
