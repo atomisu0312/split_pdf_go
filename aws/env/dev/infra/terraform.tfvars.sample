@@ -1,0 +1,2 @@
+app_vpc_id     = "vpc-XXXXXXXXXXXXXXXXX"
+route_table_id = "rtb-XXXXXXXXXXXXXXXXX"
