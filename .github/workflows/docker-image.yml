@@ -31,7 +31,7 @@ jobs:
       id: build
       run: |
         docker build ./code/split_pdf_go --file ./code/split_pdf_go/Dockerfile --tag ${{ secrets.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }} --platform linux/amd64
-        echo "::set-output name=image_tag::${{ env.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }}"
+        echo "::set-output name=image_tag::${{ secrets.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }}"
     - name: login to docker hub
       env:
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
