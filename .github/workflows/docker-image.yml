@@ -47,4 +47,4 @@ jobs:
       env:
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         time_stamp: ${{ env.time_stamp }}
-      run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-1.amazonaws.com/${{ env.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }}
+      run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-1.amazonaws.com/${{ secrets.ECR_REPOSITORY_NAME }}:${{ env.time_stamp }}
