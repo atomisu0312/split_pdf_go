@@ -37,7 +37,12 @@ docker build -t split_pdf_go .
 ```
 docker run --rm --env-file .env.docker split_pdf_go
 ```
+## ECRにPushする処理
+1. ECRリポジトリを作成
 
+2. AWSの記述に従ってPushしてくれればOK
+
+3. 以下、split_pdf_goという名前のリポジトリを作ったと想定
 # 参考リンク
 - ECSでワンショットタスクを行う手順：https://tech.classi.jp/entry/one-shot-task-with-step-functions-and-ecs
 
