@@ -1,0 +1,52 @@
+/* @theme ashigara */
+/* Author: atomisu0312 */
+
+@import "gaia";
+
+:root {
+  --main-theme: rgb(14, 131, 253);
+  --background-theme: rgb(239, 255, 255);
+  --background-code: rgb(255, 229, 193);
+  --black: rgb(40, 40, 40);
+  --lead-h1-font-size: 50px;
+  --lead-h2-font-size: 40px;
+  --lead-h3-font-size: 30px;
+  --h1-font-size: 50px;
+  --h2-font-size: 45px;
+  --h3-font-size: 40px;
+  --h4-font-size: 35px;
+  --mini-font-size: 20px;
+  --header-footer-height: 50px;
+  --header-footer-font-size: 20px;
+  --main-font-size: 30px;
+  --font-weight-light: 200;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  --normal-border-radius: 5px;
+}
+
+
+section {
+  margin: 20 auto 0px;
+}
+
+section.lead h1 {
+  font-size: var(--lead-h1-font-size);
+  margin: 0 auto 30px;
+  border: 0;
+}
+
+section.lead h2 {
+  font-size: var(--lead-h2-font-size);
+  margin: 0 auto 100px;
+}
+
+section.lead h3 {
+  font-size: var(--lead-h3-font-size);
+  margin: 0 auto 100px;
+  border: 0;
+}
+
+section::after {
+  content: attr(data-marpit-pagination);
+}
