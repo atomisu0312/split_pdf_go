@@ -168,6 +168,30 @@ JSONで記述すると以下の通り
 ### 4. S3を確認して、アップロードされていることを確認
 一応OK
 
+## StepFunctionsによる実行
+### 1. ステートマシンの作成
+基本的に以降はTerraformでリソース管理をします
+- terraform.tfvars.sampleをterraform.tfvarsにコピーして適切な値を設定してください
+- aws/env/dev/infra 内でリソースを展開してください
+```
+cd ${リポジトリのroot}/aws/env/dev/infra
+terraform init
+terraform plan
+terraform apply
+```
+
+- リソースが無事展開できたら、mainディレクトリに入って同様にリソースをデプロイしてください
+- main.tfがステートマシンの実体となっており、環境が用意できていれば、これだけ実行すれば最悪大丈夫なはずです。
+```
+cd ${リポジトリのroot}/aws/env/dev/infra
+terraform init
+terraform plan
+terraform apply
+```
+
+### 2. Step Functionsの実行
+- マネジメントコンソール上から実行していただければ大丈夫です
+
 # 参考リンク
 - StepFunctions x ECSでワンショットタスクを行う手順：https://tech.classi.jp/entry/one-shot-task-with-step-functions-and-ecs
 - 環境変数をオーバーライドする手順：https://qiita.com/piro-gxp/items/5202d6aba1523bcec685

@@ -21,8 +21,12 @@ resource "aws_sfn_state_machine" "enjoy_ecs_run_task" {
               {
                 "Environment" : [
                   {
-                    "Name" : "hoge",
-                    "Value.$" : "$.VALUE"
+                    "Name" : "START_PAGE",
+                    "Value.$" : "$.s1"
+                  },
+                  {
+                    "Name" : "END_PAGE",
+                    "Value.$" : "$.e1"
                   }
                 ],
                 "Name" : "app"
