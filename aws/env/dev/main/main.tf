@@ -8,4 +8,7 @@ module "stepfunctions" {
   task_definition_arn     = var.task_definition_arn
   task_role_arn           = var.task_role_arn
   task_execution_role_arn = var.task_execution_role_arn
+  num_machine             = var.num_machine
+  default_pdf_name        = var.default_pdf_name
+  default_bucket_name     = var.default_bucket_name
 }

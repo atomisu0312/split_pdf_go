@@ -191,7 +191,19 @@ terraform apply
 
 ### 2. Step Functionsの実行
 - マネジメントコンソール上から実行していただければ大丈夫です
-
+パラメータの例は以下の通り
+```
+{
+  "s0": "4",
+  "e0": "5",
+  "s1": "9",
+  "e1": "9",
+  "s2": "10",
+  "e2": "10",
+  "bucket_name": "split-pdf-go-atomisu",
+  "file_name": "Hadoop_document_Cluster.pdf"
+}
+```
 # 参考リンク
 - StepFunctions x ECSでワンショットタスクを行う手順：https://tech.classi.jp/entry/one-shot-task-with-step-functions-and-ecs
 - 環境変数をオーバーライドする手順：https://qiita.com/piro-gxp/items/5202d6aba1523bcec685

@@ -22,6 +22,14 @@ locals {
             {
               "Name"    = "END_PAGE"
               "Value.$" = "$.end"
+            },
+            {
+              "Name"    = "FILE_NAME"
+              "Value.$" = "$.file_name"
+            },
+            {
+              "Name"    = "BUCKET_NAME"
+              "Value.$" = "$.bucket_name"
             }
           ]
         }
@@ -35,6 +43,24 @@ locals {
     Parameters : local.ecs_task_parameters,
     End : true
   }
+
+  # ブランチを生成
+  branches = [for num in range(var.num_machine) : {
+    StartAt = "TransformInput${num}"
+    States = {
+      "TransformInput${num}" = {
+        Type = "Pass"
+        Parameters = {
+          "start.$"       = "$.s${num}"
+          "end.$"         = "$.e${num}"
+          "file_name.$"   = "$.file_name"
+          "bucket_name.$" = "$.bucket_name"
+        }
+        Next = "RunECSTask${num}"
+      }
+      "RunECSTask${num}" = local.ecs_task
+    }
+  }]
 }
 
 resource "aws_sfn_state_machine" "enjoy_ecs_run_task" {
@@ -50,36 +76,7 @@ resource "aws_sfn_state_machine" "enjoy_ecs_run_task" {
         "Comment" : "A Parallel state can be used to create parallel branches of execution in your state machine.",
         "Type" : "Parallel",
         "Next" : "endPass",
-        "Branches" : [
-          {
-            StartAt : "TransformInput",
-            States : {
-              TransformInput : {
-                Type = "Pass",
-                Parameters = {
-                  "start.$" = "$.s1",
-                  "end.$"   = "$.e1"
-                },
-                Next = "RunECSTask"
-              },
-              RunECSTask : local.ecs_task
-            }
-          },
-          {
-            StartAt : "TransformInput2",
-            States : {
-              TransformInput2 : {
-                Type = "Pass",
-                Parameters = {
-                  "start.$" = "$.s2",
-                  "end.$"   = "$.e2"
-                },
-                Next = "RunECSTask2"
-              },
-              RunECSTask2 : local.ecs_task
-            }
-          }
-        ]
+        "Branches" : local.branches
       },
       endPass : {
         "Comment" : "終了ステップ",
