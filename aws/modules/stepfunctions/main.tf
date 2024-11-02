@@ -1,41 +1,92 @@
+locals {
+  // ECSタスクそのものを別個のパラメータとして定義
+  ecs_task_parameters = {
+    Cluster        = var.cluster_arn
+    TaskDefinition = var.task_definition_arn
+    LaunchType     = "FARGATE"
+    NetworkConfiguration = {
+      AwsvpcConfiguration = {
+        SecurityGroups = [var.security_group_id]
+        Subnets        = [var.subnet_id]
+      }
+    }
+    Overrides = {
+      ContainerOverrides = [
+        {
+          Name = "app"
+          Environment = [
+            {
+              "Name"    = "START_PAGE"
+              "Value.$" = "$.start"
+            },
+            {
+              "Name"    = "END_PAGE"
+              "Value.$" = "$.end"
+            }
+          ]
+        }
+      ]
+    }
+  }
+
+  ecs_task = {
+    Type : "Task",
+    Resource : "arn:aws:states:::ecs:runTask.sync",
+    Parameters : local.ecs_task_parameters,
+    End : true
+  }
+}
+
 resource "aws_sfn_state_machine" "enjoy_ecs_run_task" {
   definition = jsonencode({
-    StartAt : "RunECSTask",
+    StartAt : "Pass",
     States : {
-      RunECSTask : {
-        Type : "Task",
-        Resource : "arn:aws:states:::ecs:runTask.sync",
-        Parameters : {
-          Cluster : var.cluster_arn,
-          TaskDefinition : var.task_definition_arn
-          LaunchType : "FARGATE",
-          NetworkConfiguration : {
-            AwsvpcConfiguration : {
-              SecurityGroups : [var.security_group_id],
-              Subnets : [var.subnet_id]
+      Pass : {
+        "Comment" : "開始ステップ",
+        "Type" : "Pass",
+        "Next" : "Parallel_State",
+      },
+      Parallel_State : {
+        "Comment" : "A Parallel state can be used to create parallel branches of execution in your state machine.",
+        "Type" : "Parallel",
+        "Next" : "endPass",
+        "Branches" : [
+          {
+            StartAt : "TransformInput",
+            States : {
+              TransformInput : {
+                Type = "Pass",
+                Parameters = {
+                  "start.$" = "$.s1",
+                  "end.$"   = "$.e1"
+                },
+                Next = "RunECSTask"
+              },
+              RunECSTask : local.ecs_task
             }
           },
-          Overrides : {
-            # 環境変数を渡すように変更すること
-            ContainerOverrides : [
-              {
-                "Environment" : [
-                  {
-                    "Name" : "START_PAGE",
-                    "Value.$" : "$.s1"
-                  },
-                  {
-                    "Name" : "END_PAGE",
-                    "Value.$" : "$.e1"
-                  }
-                ],
-                "Name" : "app"
-              }
-            ],
+          {
+            StartAt : "TransformInput2",
+            States : {
+              TransformInput2 : {
+                Type = "Pass",
+                Parameters = {
+                  "start.$" = "$.s2",
+                  "end.$"   = "$.e2"
+                },
+                Next = "RunECSTask2"
+              },
+              RunECSTask2 : local.ecs_task
+            }
           }
-        },
+        ]
+      },
+      endPass : {
+        "Comment" : "終了ステップ",
+        "Type" : "Pass",
         End : true
-      }
+      },
+
     }
   })
   role_arn = aws_iam_role.enjoy_ecs_task_run.arn
