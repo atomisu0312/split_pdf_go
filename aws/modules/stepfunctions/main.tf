@@ -17,18 +17,18 @@ locals {
           Environment = [
             {
               "Name"    = "START_PAGE"
-              "Value.$" = "$.start"
+              "Value.$" = "States.Format('{}',$.start)"
             },
             {
               "Name"    = "END_PAGE"
-              "Value.$" = "$.end"
+              "Value.$" = "States.Format('{}',$.end)"
             },
             {
               "Name"    = "FILE_NAME"
               "Value.$" = "$.file_name"
             },
             {
-              "Name"    = "BACKET_NAME" # バケット名のタイポがあるので注意
+              "Name"    = "BUCKET_NAME"
               "Value.$" = "$.bucket_name"
             }
           ]
@@ -46,19 +46,56 @@ locals {
 
   # ブランチを生成
   branches = [for num in range(var.num_machine) : {
-    StartAt = "TransformInput${num}"
+    StartAt = "CheckLengthChoice${num}"
     States = {
+      # 開始・終了ページのリスト長を元に、実行するかどうかを判断
+      "CheckLengthChoice${num}" : {
+        "Type" : "Choice",
+        "Choices" : [
+          {
+            "Or" : [
+              {
+                "Variable" : "$.start_length",
+                "NumericLessThanEquals" : "${num}"
+              },
+              {
+                "Variable" : "$.end_length",
+                "NumericLessThanEquals" : "${num}"
+              }
+            ],
+            "Next" : "NonExectuion${num}"
+          }
+        ],
+        "Default" : "TransformInput${num}"
+      },
+      # 開始・終了ページを取得
       "TransformInput${num}" = {
         Type = "Pass"
         Parameters = {
-          "start.$"       = "$.s${num}"
-          "end.$"         = "$.e${num}"
+          "start.$"       = "States.ArrayGetItem($.start_pages, ${num})"
+          "end.$"         = "States.ArrayGetItem($.end_pages, ${num})"
           "file_name.$"   = "$.file_name"
           "bucket_name.$" = "$.bucket_name"
         }
-        Next = "RunECSTask${num}"
+        Next = "ValidationInput${num}"
+      },
+      # 開始・終了ページの順序が正しいかどうか、そして数字として解釈できるかどうかをチェック
+      "ValidationInput${num}" : {
+        "Type" : "Choice",
+        "Choices" : [
+          {
+            "Variable" : "$.start",
+            "NumericLessThanEqualsPath" : "$.end",
+            "Next" : "RunECSTask${num}"
+          }
+        ],
+        "Default" : "NonExectuion${num}"
       }
-      "RunECSTask${num}" = local.ecs_task
+      "RunECSTask${num}" = local.ecs_task,
+      "NonExectuion${num}" : {
+        "Type" : "Pass",
+        "End" : true
+      },
     }
   }]
 }
@@ -71,6 +108,15 @@ resource "aws_sfn_state_machine" "enjoy_ecs_run_task" {
         "Comment" : "開始ステップ",
         "Type" : "Pass",
         "Next" : "Parallel_State",
+        Parameters : {
+          "start_length.$" : "States.ArrayLength($.start_pages)",
+          "end_length.$" : "States.ArrayLength($.end_pages)",
+          "start_pages.$" : "$.start_pages",
+          "end_pages.$" : "$.end_pages",
+          "bucket_name.$" : "$.bucket_name",
+          "file_name.$" : "$.file_name",
+        }
+
       },
       Parallel_State : {
         "Comment" : "A Parallel state can be used to create parallel branches of execution in your state machine.",

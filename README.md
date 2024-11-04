@@ -194,16 +194,10 @@ terraform apply
 パラメータの例は以下の通り
 ```
 {
-  "s0": "4",
-  "e0": "5",
-  "s1": "9",
-  "e1": "9",
-  "s2": "1024",
-  "e2": "1034",
-  "s3": "5",
-  "e3": "8",
   "bucket_name": "split-pdf-go-atomisu",
-  "file_name": "sagemaker-dg.pdf"
+  "file_name": "Hadoop_document_Cluster.pdf",
+  "start_pages":[1,2,3,5],
+  "end_pages":[8,3,9,10]
 }
 ```
 # 参考リンク
