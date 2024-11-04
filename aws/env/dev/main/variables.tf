@@ -27,10 +27,3 @@ variable "task_execution_role_arn" {
 variable "num_machine" {
   type = number
 }
-
-variable "default_pdf_name" {
-  type = string
-}
-variable "default_bucket_name" {
-  type = string
-}

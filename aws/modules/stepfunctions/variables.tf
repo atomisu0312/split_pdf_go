@@ -7,5 +7,3 @@ variable "account_id" {}
 variable "task_role_arn" {}
 variable "task_execution_role_arn" {}
 variable "num_machine" {}
-variable "default_pdf_name" {}
-variable "default_bucket_name" {}
