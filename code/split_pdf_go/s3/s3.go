@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"split_pdf_go/util"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -65,19 +64,11 @@ func (basics BucketBasics) UploadFile(bucketName string, objectKey string, fileN
 	return err
 }
 
-// envファイルを読み込んだ上で、環境変数に格納されたプロパティをもとにファイルをダウンロード
-func SaveTargetFileInTmp(envPath string) {
+// 環境変数に格納されたプロパティをもとにファイルをダウンロード
+func SaveTargetFileInTmp() {
 	// tmpディレクトリがない場合は作成
 	if _, err := os.Stat("tmp"); os.IsNotExist(err) {
 		os.Mkdir("tmp", 0777)
-	}
-
-	// PROD="true"であれば、.envファイルを読み込まない
-	if os.Getenv("PROD") != "true" {
-		err := util.LoadEnv(envPath)
-		if err != nil {
-			log.Fatalf("Failed to load .env file: %v", err)
-		}
 	}
 
 	// AWS SDKの設定をロード
@@ -94,20 +85,12 @@ func SaveTargetFileInTmp(envPath string) {
 		S3Client: s3Client,
 	}
 
-	basics.DownloadFile(os.Getenv("BACKET_NAME"), os.Getenv("FILE_NAME"), "./tmp/tmp.pdf")
+	basics.DownloadFile(os.Getenv("BUCKET_NAME"), os.Getenv("FILE_NAME"), "./tmp/tmp.pdf")
 
 }
 
 // s3にファイルをアップロードする処理
-func UplodTargetFileInSpritRange(envPath string, splitRange string) {
-	// PROD="true"であれば、.envファイルを読み込まない
-	if os.Getenv("PROD") != "true" {
-		err := util.LoadEnv(envPath)
-		if err != nil {
-			log.Fatalf("Failed to load .env file: %v", err)
-		}
-	}
-
+func UplodTargetFileInSpritRange(splitRange string) {
 	// AWS SDKの設定をロード
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-northeast-1"))
 	if err != nil {
@@ -123,7 +106,7 @@ func UplodTargetFileInSpritRange(envPath string, splitRange string) {
 	}
 	// 現在の時刻を取得してフォーマット
 	timestamp := time.Now().Format("20060102150405")
-	uploadFileName := fmt.Sprintf("%s_splited_%s_%s.pdf", os.Getenv("FILE_NAME"), splitRange, timestamp)
+	uploadFileName := fmt.Sprintf("%s_splited_%s_%s.pdf", os.Getenv("FILE_NAME"), timestamp, splitRange)
 
-	basics.UploadFile(os.Getenv("BACKET_NAME"), uploadFileName, "./output.pdf")
+	basics.UploadFile(os.Getenv("BUCKET_NAME"), uploadFileName, "./output.pdf")
 }

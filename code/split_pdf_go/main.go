@@ -3,15 +3,28 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"split_pdf_go/s3"
+	"split_pdf_go/util"
 
 	"github.com/pdfcpu/pdfcpu/pkg/api"
 )
 
 func main() {
+
+	envPath := "./.env"
+
+	// PROD="true"であれば、.envファイルを読み込まない
+	if os.Getenv("PROD") != "true" {
+		err := util.LoadEnv(envPath)
+		if err != nil {
+			log.Fatalf("Failed to load .env file: %v", err)
+		}
+	}
+
 	// s3にファイルをダウンロードする処理
-	s3.SaveTargetFileInTmp("./.env")
+	s3.SaveTargetFileInTmp()
 
 	// 環境変数 START_PAGE を取得
 	envValueStart, existsStart := os.LookupEnv("START_PAGE")
@@ -39,5 +52,5 @@ func main() {
 	api.TrimFile("./tmp/tmp.pdf", "output.pdf", splitRange, nil)
 
 	// s3にファイルをアップロードする処理
-	s3.UplodTargetFileInSpritRange("./.env", fmt.Sprintf("%s-%s", *splitnumStart, *splitnumEnd))
+	s3.UplodTargetFileInSpritRange(fmt.Sprintf("%s-%s", *splitnumStart, *splitnumEnd))
 }
