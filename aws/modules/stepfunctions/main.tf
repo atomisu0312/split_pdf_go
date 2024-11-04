@@ -28,7 +28,7 @@ locals {
               "Value.$" = "$.file_name"
             },
             {
-              "Name"    = "BUCKET_NAME"
+              "Name"    = "BACKET_NAME" # バケット名のタイポがあるので注意
               "Value.$" = "$.bucket_name"
             }
           ]
@@ -65,9 +65,9 @@ locals {
 
 resource "aws_sfn_state_machine" "enjoy_ecs_run_task" {
   definition = jsonencode({
-    StartAt : "Pass",
+    StartAt : "startPass",
     States : {
-      Pass : {
+      startPass : {
         "Comment" : "開始ステップ",
         "Type" : "Pass",
         "Next" : "Parallel_State",
@@ -83,7 +83,6 @@ resource "aws_sfn_state_machine" "enjoy_ecs_run_task" {
         "Type" : "Pass",
         End : true
       },
-
     }
   })
   role_arn = aws_iam_role.enjoy_ecs_task_run.arn

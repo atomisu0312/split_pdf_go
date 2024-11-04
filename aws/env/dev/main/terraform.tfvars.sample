@@ -6,6 +6,6 @@ subnet_id               = "subnet-sample"        # S3とECRにアクセスでき
 task_definition_arn     = "arn:aws:ecs:your-region:accountID123:task-definition/your-task-definition:rev"
 task_role_arn           = "arn:aws:iam::accountID123:role/ecsTaskRole" #S3へのサクセス権限を忘れずに
 task_execution_role_arn = "arn:aws:iam::accountID123:role/ecsTaskExecutionRole"
-num_machine             = 3
+num_machine             = 4
 default_pdf_name        = "some.pdf"
 default_bucket_name     = "your-pdf-backet"

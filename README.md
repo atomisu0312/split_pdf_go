@@ -198,10 +198,12 @@ terraform apply
   "e0": "5",
   "s1": "9",
   "e1": "9",
-  "s2": "10",
-  "e2": "10",
+  "s2": "1024",
+  "e2": "1034",
+  "s3": "5",
+  "e3": "8",
   "bucket_name": "split-pdf-go-atomisu",
-  "file_name": "Hadoop_document_Cluster.pdf"
+  "file_name": "sagemaker-dg.pdf"
 }
 ```
 # 参考リンク
