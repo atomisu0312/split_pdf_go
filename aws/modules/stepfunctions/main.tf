@@ -6,6 +6,7 @@ locals {
     LaunchType     = "FARGATE"
     NetworkConfiguration = {
       AwsvpcConfiguration = {
+        AssignPublicIp = "ENABLED"
         SecurityGroups = [var.security_group_id]
         Subnets        = [var.subnet_id]
       }

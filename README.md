@@ -195,9 +195,9 @@ terraform apply
 ```
 {
   "bucket_name": "split-pdf-go-atomisu",
-  "file_name": "Hadoop_document_Cluster.pdf",
-  "start_pages":[1,2,3,5],
-  "end_pages":[8,3,9,10]
+  "file_name": "sagemaker-dg.pdf",
+  "start_pages":[2411,2842,2864,3030,4428],
+  "end_pages":[2841,2863,3029,4427,5131]
 }
 ```
 # 参考リンク
