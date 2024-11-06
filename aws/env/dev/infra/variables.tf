@@ -8,3 +8,8 @@ variable "route_table_id" {
   type        = string
 }
 
+variable "region" {
+  description = "The region in which the VPC will be created"
+  type        = string
+
+}
