@@ -13,5 +13,10 @@ module "stepfunctions" {
 
 module "ecs" {
   source    = "../../../modules/ecs"
-  image_arn = var.image_arn
+  image_arn = module.ecr.image_uri
+}
+
+module "ecr" {
+  source          = "../../../modules/ecr"
+  repository_name = var.repository_name
 }
