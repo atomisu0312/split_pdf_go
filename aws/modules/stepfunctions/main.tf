@@ -7,7 +7,7 @@ locals {
     NetworkConfiguration = {
       AwsvpcConfiguration = {
         AssignPublicIp = "ENABLED"
-        SecurityGroups = [var.security_group_id]
+        SecurityGroups = [aws_security_group.ecs_container_sg.id]
         Subnets        = [var.subnet_id]
       }
     }
@@ -193,4 +193,20 @@ resource "aws_iam_policy" "enjoy_ecs_task_run" {
       }
     ]
   })
+}
+
+resource "aws_security_group" "ecs_container_sg" {
+  vpc_id = var.vpc_id
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }

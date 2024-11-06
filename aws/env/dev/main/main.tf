@@ -3,7 +3,7 @@ module "stepfunctions" {
   account_id              = var.account_id
   region                  = var.region
   cluster_arn             = module.ecs.cluster_arn
-  security_group_id       = var.security_group_id
+  vpc_id                  = var.vpc_id
   subnet_id               = var.subnet_id
   task_definition_arn     = module.ecs.task_definition_arn
   task_role_arn           = module.ecs.ecs_role_arn
