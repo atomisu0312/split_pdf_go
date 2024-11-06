@@ -44,152 +44,46 @@ docker run --rm --env-file .env.docker split_pdf_go
 
 3. 以下、split_pdf_goという名前のリポジトリを作ったと想定
 
-## ECSによる実行
-### 1. タスク定義の準備
-JSONで記述すると以下の通り
-```json
-{
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:${AWS_ACCOUNT_ID}:task-definition/${TASK_DEFINITION_NAME}:3",
-    "containerDefinitions": [
-        {
-            "name": "app",
-            "image": "${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/${IMAGE_NAME}:1730307307",
-            "cpu": 0,
-            "portMappings": [
-                {
-                    "name": "app-80-tcp",
-                    "containerPort": 80,
-                    "hostPort": 80,
-                    "protocol": "tcp",
-                    "appProtocol": "http"
-                }
-            ],
-            "essential": true,
-            "environment": [
-                {
-                    "name": "PROD",
-                    "value": "true"
-                },
-                {
-                    "name": "START_PAGE",
-                    "value": "2"
-                },
-                {
-                    "name": "PDF_PATH",
-                    "value": "arn:aws:s3:::${BACKET_NAME}/${PDF_NAME}"
-                },
-                {
-                    "name": "END_PAGE",
-                    "value": "9"
-                },
-                {
-                    "name": "BACKET_NAME",
-                    "value": "${BACKET_NAME}"
-                },
-                {
-                    "name": "FILE_NAME",
-                    "value": "${PDF_NAME}"
-                }
-            ],
-            "environmentFiles": [],
-            "mountPoints": [],
-            "volumesFrom": [],
-            "ulimits": [],
-            "systemControls": []
-        }
-    ],
-    "family": "split-go-pdf0",
-    "taskRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${customRole}",
-    "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole",
-    "networkMode": "awsvpc",
-    "revision": 2,
-    "volumes": [],
-    "status": "ACTIVE",
-    "requiresAttributes": [
-        {
-            "name": "com.amazonaws.ecs.capability.ecr-auth"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.task-iam-role"
-        },
-        {
-            "name": "ecs.capability.execution-role-ecr-pull"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-        },
-        {
-            "name": "ecs.capability.task-eni"
-        }
-    ],
-    "placementConstraints": [],
-    "compatibilities": [
-        "EC2",
-        "FARGATE"
-    ],
-    "requiresCompatibilities": [
-        "FARGATE"
-    ],
-    "cpu": "2048",
-    "memory": "4096",
-    "runtimePlatform": {
-        "cpuArchitecture": "X86_64",
-        "operatingSystemFamily": "LINUX"
-    },
-    "registeredAt": "2024-10-30T17:14:57.555Z",
-    "registeredBy": "arn:aws:iam::${AWS_ACCOUNT_ID}:user/${myName}",
-    "enableFaultInjection": false,
-    "tags": []
-}
+## Terraformによるインフラの構築
+### 1. Terraformのインストール
+インフラの構築自体はTerraformで実行します
+Terraformのインストール方法は以下を参照してください。
+https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+
+### 2. 既存VPCの用意
+VPCとサブネット（パブリックサブネット）、および、ルートテーブルは各自で用意してください。
+
+なお、プライベートサブネットで展開する場合には以下のエンドポイントと紐づいていることを確認してください。
+- S3エンドポイント
+- ECR用エンドポイント２種
+
+### 3. 事前準備
+以下のディレクトリに移動し、
+
 ```
-ちなみに環境変数はStepFunctions実行時に上書きできる。
-詳細は右の通り：https://qiita.com/piro-gxp/items/5202d6aba1523bcec685
+$ cd ${root}/aws/env/dev/main
+```
 
-### 2. クラスターの準備
-とりあえず名前だけ用意
+terraform.tfvars.sample→terraform.tfvarsと名前を変えてコピーし、適切な設定に書き換えてください。
+設定項目の一覧は以下の通りです。
 
-### 3. クラスターからタスクを一回実行
-以下を設定
-- 環境
-  - キャパシティプロバイダ戦略
-  - あとはデフォルト
-- デプロイ設定
-  - アプリケーションタイプ：タスク
-  - タスク定義のファミリー：task definition
-  - タスク数：1
-- ネットワーキング
-  - VPC：S3にアクセスできる
-  - サブネット：S3にアクセスできる
-  - セキュリティグループ：デフォルトのものを指定（本当はよくないが、全開放で）
-  - パブリックIP：オフ
+```
+account_id              = "12桁のアレ"
+region                  = "your-region"
+vpc_id                  = "vpc-ZZZZZXXXXZZZZXXXX"
+subnet_id               = "subnet-sample"        # S3とECRにアクセスできればPrivateSubnetで問題ない
+repository_name         = "split_pdf_go"
+num_machine             = 5
+```
 
-あとはそのまま実行
-
-### 4. S3を確認して、アップロードされていることを確認
-一応OK
+### 4. インフラ構築の実行
+以下のコマンドを実行してください。適切に準備できていれば動くはずです。
+```
+terraform init
+terraform apply
+```
 
 ## StepFunctionsによる実行
-### 1. ステートマシンの作成
-基本的に以降はTerraformでリソース管理をします
-- terraform.tfvars.sampleをterraform.tfvarsにコピーして適切な値を設定してください
-- aws/env/dev/infra 内でリソースを展開してください
-```
-cd ${リポジトリのroot}/aws/env/dev/infra
-terraform init
-terraform plan
-terraform apply
-```
-
-- リソースが無事展開できたら、mainディレクトリに入って同様にリソースをデプロイしてください
-- main.tfがステートマシンの実体となっており、環境が用意できていれば、これだけ実行すれば最悪大丈夫なはずです。
-```
-cd ${リポジトリのroot}/aws/env/dev/infra
-terraform init
-terraform plan
-terraform apply
-```
-
-### 2. Step Functionsの実行
 - マネジメントコンソール上から実行していただければ大丈夫です
 パラメータの例は以下の通り
 ```

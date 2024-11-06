@@ -1,6 +1,6 @@
 account_id              = "12桁のアレ"
 region                  = "your-region"
-security_group_id       = "sg-000aaaaaaaaaaaaaa" # ひとまず全開放としているが、
+vpc_id                  = "vpc-ZZZZZXXXXZZZZXXXX"
 subnet_id               = "subnet-sample"        # S3とECRにアクセスできればPrivateSubnetで問題ない
-num_machine       = 5
 repository_name   = "split_pdf_go"
+num_machine       = 5
