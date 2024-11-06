@@ -5,9 +5,6 @@ variable "account_id" {
 variable "region" {
   type = string
 }
-variable "cluster_arn" {
-  type = string
-}
 variable "security_group_id" {
   type = string
 }
