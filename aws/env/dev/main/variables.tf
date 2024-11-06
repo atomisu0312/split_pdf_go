@@ -11,9 +11,6 @@ variable "security_group_id" {
 variable "subnet_id" {
   type = string
 }
-variable "task_role_arn" {
-  type = string
-}
 
 variable "num_machine" {
   type = number

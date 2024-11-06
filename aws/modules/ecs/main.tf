@@ -11,7 +11,7 @@ resource "aws_ecs_task_definition" "task_definition" {
   family             = "split-go-pdf"
   cpu                = 2048
   memory             = 4096
-  task_role_arn      = var.task_role_arn
+  task_role_arn      = aws_iam_role.ecs_role.arn
   execution_role_arn = aws_iam_role.ecs_execution_role.arn
   container_definitions = jsonencode([
     {
@@ -91,4 +91,35 @@ resource "aws_iam_role_policy_attachment" "ecs_execution" {
 resource "aws_iam_role_policy_attachment" "ecs_execution2" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
   role       = aws_iam_role.ecs_execution_role.name
+}
+
+resource "aws_iam_role" "ecs_role" {
+  name = "task-role-for-split-pdf-go"
+
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "ecs-tasks.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Name = "task-role-for-split-pdf-go"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_role" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  role       = aws_iam_role.ecs_role.name
+}
+resource "aws_iam_role_policy_attachment" "ecs_role1" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  role       = aws_iam_role.ecs_role.name
 }
