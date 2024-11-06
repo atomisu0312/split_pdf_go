@@ -24,3 +24,7 @@ variable "task_execution_role_arn" {
 variable "num_machine" {
   type = number
 }
+
+variable "image_arn" {
+  type = string
+}
