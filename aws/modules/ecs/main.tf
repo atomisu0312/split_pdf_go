@@ -12,7 +12,7 @@ resource "aws_ecs_task_definition" "task_definition" {
   cpu                = 2048
   memory             = 4096
   task_role_arn      = var.task_role_arn
-  execution_role_arn = var.task_execution_role_arn
+  execution_role_arn = aws_iam_role.ecs_execution_role.arn
   container_definitions = jsonencode([
     {
       name      = "app"
@@ -57,4 +57,38 @@ resource "aws_ecs_task_definition" "task_definition" {
     operating_system_family = "LINUX"
     cpu_architecture        = "X86_64"
   }
+}
+
+# タスク起動用IAMロールの定義
+resource "aws_iam_role" "ecs_execution_role" {
+  name = "task-execution-role-for-split-pdf-go"
+
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "ecs-tasks.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Name = "task-execution-role-for-split-pdf-go"
+  }
+}
+
+# タスク起動用IAMロールへのポリシー割り当て
+resource "aws_iam_role_policy_attachment" "ecs_execution" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  role       = aws_iam_role.ecs_execution_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_execution2" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  role       = aws_iam_role.ecs_execution_role.name
 }
