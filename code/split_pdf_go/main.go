@@ -13,10 +13,9 @@ import (
 
 func main() {
 
-	envPath := "./.env"
-
 	// PROD="true"であれば、.envファイルを読み込まない
 	if os.Getenv("PROD") != "true" {
+		envPath := "./.env"
 		err := util.LoadEnv(envPath)
 		if err != nil {
 			log.Fatalf("Failed to load .env file: %v", err)
@@ -42,7 +41,7 @@ func main() {
 
 	// アプリ引数＞環境変数＞デフォルト値の順で優先度を持たせる
 	var splitnumStart = flag.String("start", envValueStart, "split start")
-	var splitnumEnd = flag.String("end", envValueEnd, "split start")
+	var splitnumEnd = flag.String("end", envValueEnd, "split end")
 	flag.Parse()
 
 	// splitnumStart と splitnumEnd をハイフンで繋げた新しい文字列を作成
