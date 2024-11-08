@@ -46,9 +46,9 @@ docker run --rm --env-file .env.docker split_pdf_go
 
 ## Terraformによるインフラの構築
 ### 1. Terraformのインストール
-インフラの構築自体はTerraformで実行します
-Terraformのインストール方法は以下を参照してください。
-https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+インフラの構築自体はTerraform → OpenTofuで実行します
+OpenTofuのインストール方法は以下を参照してください。
+https://opentofu.org/docs/intro/install/
 
 ### 2. 既存VPCの用意
 VPCとサブネット（パブリックサブネット）、および、ルートテーブルは各自で用意してください。
@@ -79,8 +79,8 @@ num_machine             = 5
 ### 4. インフラ構築の実行
 以下のコマンドを実行してください。適切に準備できていれば動くはずです。
 ```
-terraform init
-terraform apply
+tofu init
+tofu apply
 ```
 
 ## StepFunctionsによる実行
@@ -89,9 +89,9 @@ terraform apply
 ```
 {
   "bucket_name": "split-pdf-go-atomisu",
-  "file_name": "sagemaker-dg.pdf",
-  "start_pages":[2411,2842,2864,3030,4428],
-  "end_pages":[2841,2863,3029,4427,5131]
+  "file_name": "sagemaker-dg.ch10.Deploy-models-for-inference.pdf",
+  "start_pages":[1,2842,2864,3030,4428],
+  "end_pages":[80,]
 }
 ```
 # 参考リンク

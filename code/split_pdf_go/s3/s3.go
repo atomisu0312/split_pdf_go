@@ -64,7 +64,7 @@ func (basics BucketBasics) UploadFile(bucketName string, objectKey string, fileN
 	return err
 }
 
-// 環境変数に格納されたプロパティをもとにファイルをダウンロード
+// 環境変数に格納されたプロパティをもとにS3からファイルをダウンロード
 func SaveTargetFileInTmp() {
 	// tmpディレクトリがない場合は作成
 	if _, err := os.Stat("tmp"); os.IsNotExist(err) {
